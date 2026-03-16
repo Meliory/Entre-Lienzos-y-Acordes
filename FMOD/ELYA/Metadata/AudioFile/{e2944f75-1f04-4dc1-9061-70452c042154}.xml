@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{e2944f75-1f04-4dc1-9061-70452c042154}">
+		<property name="assetPath">
+			<value>Tras bambalinas.wav</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>148.71414965986395</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{4dd11f90-7f47-42f8-b8f2-83a1770ecd69}</destination>
+		</relationship>
+	</object>
+</objects>
