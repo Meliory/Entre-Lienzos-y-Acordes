@@ -618,7 +618,7 @@ namespace FMODUnity
 
         public static void Startup()
         {
-            EventReference.GuidLookupDelegate = (path) => {
+            EventRef.GuidLookupDelegate = (path) => {
                 EditorEventRef editorEventRef = EventFromPath(path);
 
                 return (editorEventRef != null) ? editorEventRef.Guid : new FMOD.GUID();
@@ -698,9 +698,9 @@ namespace FMODUnity
                         type.Name, scene.name, EditorUtils.GameObjectPath(behaviour), field.Name,
                         UpdaterInstructions);
                 }
-                else if (field.FieldType == typeof(EventReference))
+                else if (field.FieldType == typeof(EventRef))
                 {
-                    EventReference eventReference = (EventReference)field.GetValue(behaviour);
+                    EventRef eventReference = (EventRef)field.GetValue(behaviour);
 
                     bool changed;
                     if (!ValidateEventReference(ref eventReference, behaviour, scene, out changed))
@@ -720,7 +720,7 @@ namespace FMODUnity
         }
 
         // Returns true if eventReference is valid, sets changed if eventReference was changed
-        private static bool ValidateEventReference(ref EventReference eventReference,
+        private static bool ValidateEventReference(ref EventRef eventReference,
             Component parent, Scene scene, out bool changed)
         {
             changed = false;
@@ -1219,7 +1219,7 @@ namespace FMODUnity
             }
         }
 
-        public static EventLinkage GetEventLinkage(EventReference eventReference)
+        public static EventLinkage GetEventLinkage(EventRef eventReference)
         {
             if (Settings.Instance.EventLinkage == EventLinkage.Path)
             {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{5a613dba-34dc-4e84-b49c-9b2931a00682}">
+		<property name="name">
+			<value>CalidoVol</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{c2f0d501-9b20-45cc-b0ae-b1a08329af59}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{c2f0d501-9b20-45cc-b0ae-b1a08329af59}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>2</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

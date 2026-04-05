@@ -563,6 +563,7 @@ MonoBehaviour:
   - Master
   Banks:
   - Test
+  - ZonaCancion
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0

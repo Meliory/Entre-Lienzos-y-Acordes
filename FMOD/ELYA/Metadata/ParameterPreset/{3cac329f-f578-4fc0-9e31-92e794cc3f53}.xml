@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{3cac329f-f578-4fc0-9e31-92e794cc3f53}">
+		<property name="name">
+			<value>Gelido</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{a3b84e0c-be49-41e6-9488-8a248658e9d9}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{a3b84e0c-be49-41e6-9488-8a248658e9d9}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

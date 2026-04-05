@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="EffectPreset" id="{9184464f-4aaa-43b4-bce6-e2cd2e43ed93}">
+		<property name="name">
+			<value>Flanger</value>
+		</property>
+		<relationship name="folder">
+			<destination>{1680ef53-934e-4564-acd7-b19369541953}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{773342c5-7e3d-4a00-944a-b78d87ed98a7}</destination>
+		</relationship>
+	</object>
+	<object class="FlangerEffect" id="{773342c5-7e3d-4a00-944a-b78d87ed98a7}">
+		<property name="rate">
+			<value>1.60000002</value>
+		</property>
+	</object>
+</objects>

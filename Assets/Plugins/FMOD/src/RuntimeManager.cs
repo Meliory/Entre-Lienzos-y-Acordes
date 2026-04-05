@@ -1176,7 +1176,7 @@ retry:
             return guid;
         }
 
-        public static EventReference PathToEventReference(string path)
+        public static EventRef PathToEventReference(string path)
         {
             FMOD.GUID guid;
 
@@ -1190,13 +1190,13 @@ retry:
             }
 
 #if UNITY_EDITOR
-            return new EventReference() { Path = path, Guid = guid };
+            return new EventRef() { Path = path, Guid = guid };
 #else
             return new EventReference() { Guid = guid };
 #endif
         }
 
-        public static FMOD.Studio.EventInstance CreateInstance(EventReference eventReference)
+        public static FMOD.Studio.EventInstance CreateInstance(EventRef eventReference)
         {
             try
             {
@@ -1241,7 +1241,7 @@ retry:
             return newInstance;
         }
 
-        public static void PlayOneShot(EventReference eventReference, Vector3 position = new Vector3())
+        public static void PlayOneShot(EventRef eventReference, Vector3 position = new Vector3())
         {
             try
             {
@@ -1275,7 +1275,7 @@ retry:
             }
         }
 
-        public static void PlayOneShotAttached(EventReference eventReference, GameObject gameObject)
+        public static void PlayOneShotAttached(EventRef eventReference, GameObject gameObject)
         {
             try
             {
@@ -1336,7 +1336,7 @@ retry:
             return true;
         }
 
-        public static FMOD.Studio.EventDescription GetEventDescription(EventReference eventReference)
+        public static FMOD.Studio.EventDescription GetEventDescription(EventRef eventReference)
         {
             try
             {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{925e3191-0b22-4a01-a168-6cead303b3b7}">
+		<property name="name">
+			<value>Calido</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{a96caf37-c840-4ed0-b265-7047cb34f18b}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{a96caf37-c840-4ed0-b265-7047cb34f18b}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

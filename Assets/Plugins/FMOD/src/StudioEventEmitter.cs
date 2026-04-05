@@ -9,7 +9,7 @@ namespace FMODUnity
     [AddComponentMenu("FMOD Studio/FMOD Studio Event Emitter")]
     public class StudioEventEmitter : EventHandler
     {
-        public EventReference EventReference;
+        public EventRef EventReference;
 
         [Obsolete("Use the EventReference field instead")]
         public string Event = "";
