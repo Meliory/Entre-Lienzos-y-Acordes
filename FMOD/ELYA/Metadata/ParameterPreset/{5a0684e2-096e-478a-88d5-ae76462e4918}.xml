@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{5a0684e2-096e-478a-88d5-ae76462e4918}">
+		<property name="name">
+			<value>Duales</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{454c1818-757a-4119-9962-c6b474832d42}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{454c1818-757a-4119-9962-c6b474832d42}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

@@ -4,15 +4,19 @@ using UnityEngine;
 public class ZonaPista : MonoBehaviour
 {
     [Tooltip("Nombre param FMOD")]
-    [SerializeField] 
-    private string paramName;
+    [SerializeField] private string paramName;
 
     [Tooltip("Nombre UI")]
-    [SerializeField]
-    private string displayName;
+    [SerializeField] private string displayName;
+
+    [Tooltip("Configuración Pista")]
+    [SerializeField] public bool isStartingByStart = false;
+    [SerializeField] public Color tintColor = Color.white;
 
     public string ParamName => paramName;
     public string DisplayName => displayName;
+
+    public Color TintColor => tintColor;
 
     private void Awake()
     {
@@ -24,6 +28,7 @@ public class ZonaPista : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             MusicManager.Instance.EnterPista(this);
+            ZoneShaderManager.Instance.SetTint(tintColor);
         }
     }
     
@@ -32,6 +37,7 @@ public class ZonaPista : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             MusicManager.Instance.ExitPista(this);
+            ZoneShaderManager.Instance.ClearTint();
         }
 }
 }

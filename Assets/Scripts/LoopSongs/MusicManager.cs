@@ -2,6 +2,7 @@ using FMOD.Studio;
 using FMODUnity;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour
@@ -64,11 +65,20 @@ public class MusicManager : MonoBehaviour
     {
         if (!_eventInstance.isValid()) return;
 
-        //arrancar evento primera pista
-        if (!_eventStarted)
+        if (pista.isStartingByStart)
         {
+            _eventInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             _eventInstance.start();
             _eventStarted = true;
+        }
+        else
+        {
+            //arrancar evento primera pista
+            if (!_eventStarted)
+            {
+                _eventInstance.start();
+                _eventStarted = true;
+            }
         }
 
         if (!_paramValues.ContainsKey(pista))

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{438cddbd-3fbe-4079-8851-c38f3ef07ecd}">
+		<property name="name">
+			<value>Intimos</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{e903f999-629c-42ff-bcd3-60fc9651873c}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{e903f999-629c-42ff-bcd3-60fc9651873c}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>
