@@ -562,6 +562,8 @@ MonoBehaviour:
   MasterBanks:
   - Master
   Banks:
+  - Cinematica
+  - Minijuego
   - Test
   - ZonaCancion
   BanksToLoad: []

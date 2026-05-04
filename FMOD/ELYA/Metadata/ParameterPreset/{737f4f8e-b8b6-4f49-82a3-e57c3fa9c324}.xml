@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{737f4f8e-b8b6-4f49-82a3-e57c3fa9c324}">
+		<property name="name">
+			<value>stability_ruby</value>
+		</property>
+		<relationship name="folder">
+			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{447afd24-4306-4a99-b0c3-ac5eaf861253}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{447afd24-4306-4a99-b0c3-ac5eaf861253}">
+		<property name="maximum">
+			<value>100</value>
+		</property>
+		<property name="isGlobal">
+			<value>true</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>
