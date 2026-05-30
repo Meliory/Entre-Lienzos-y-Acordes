@@ -5,9 +5,9 @@ using UnityEngine;
 public class ZonaCancion : MonoBehaviour
 {
     [SerializeField]
-    private EventRef musicEvent;
+    private EventReference musicEvent;
 
-    [Tooltip("Duración fade al entrar/salir")]
+    [Tooltip("Duraciï¿½n fade al entrar/salir")]
     [SerializeField]
     private float fadeDuration = 2f;
 

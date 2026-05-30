@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Cinematic.unity
+    guid: 96429befcc17dd24ea82038a6c7c6e88
+  - enabled: 1
+    path: Assets/Scenes/LoopSongs.unity
+    guid: 9d9f4cdf4bcb3374aa82320c75763ca5
+  - enabled: 1
+    path: Assets/Scenes/Minigame.unity
+    guid: 43560841f476ee742873a6049ace5cdd
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

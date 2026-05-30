@@ -1953,10 +1953,10 @@ namespace FMODUnity
 #endif
         }
 
-        public static EventRef GetEventReference(this SerializedProperty property)
+        public static EventReference GetEventReference(this SerializedProperty property)
         {
             SerializedProperty guidProperty = property.FindPropertyRelative("Guid");
-            return new EventRef()
+            return new EventReference()
             {
                 Path = property.GetEventReferencePath(),
                 Guid = guidProperty.GetGuid(),

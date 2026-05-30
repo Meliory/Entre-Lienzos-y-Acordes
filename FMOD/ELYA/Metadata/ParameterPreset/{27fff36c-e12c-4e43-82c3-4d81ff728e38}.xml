@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="ParameterPreset" id="{27fff36c-e12c-4e43-82c3-4d81ff728e38}">
 		<property name="name">
-			<value>stability_aura</value>
+			<value>distorsion_aura</value>
 		</property>
 		<relationship name="folder">
 			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
@@ -12,9 +12,6 @@
 		</relationship>
 	</object>
 	<object class="GameParameter" id="{9efbaf4e-59ae-4924-94db-edffb90bedfd}">
-		<property name="maximum">
-			<value>100</value>
-		</property>
 		<property name="isGlobal">
 			<value>true</value>
 		</property>

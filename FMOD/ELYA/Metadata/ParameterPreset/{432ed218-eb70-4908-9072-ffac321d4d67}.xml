@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="ParameterPreset" id="{432ed218-eb70-4908-9072-ffac321d4d67}">
 		<property name="name">
-			<value>stability_ramon</value>
+			<value>distorsion_ramon</value>
 		</property>
 		<relationship name="folder">
 			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
@@ -12,9 +12,6 @@
 		</relationship>
 	</object>
 	<object class="GameParameter" id="{dadd5ecc-d4c2-464e-b790-2809971654f4}">
-		<property name="maximum">
-			<value>100</value>
-		</property>
 		<property name="isGlobal">
 			<value>true</value>
 		</property>

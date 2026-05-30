@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="ParameterPreset" id="{b5d14b4f-f0f5-45d9-b263-bb95fba35820}">
 		<property name="name">
-			<value>stability_alberto</value>
+			<value>distorsion_alberto</value>
 		</property>
 		<relationship name="folder">
 			<destination>{671ee433-06e8-4ac4-bfbf-088235dd07b9}</destination>
@@ -12,9 +12,6 @@
 		</relationship>
 	</object>
 	<object class="GameParameter" id="{a35a69f1-9a31-479f-9069-aa313518b53b}">
-		<property name="maximum">
-			<value>100</value>
-		</property>
 		<property name="isGlobal">
 			<value>true</value>
 		</property>

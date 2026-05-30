@@ -1,10 +1,14 @@
 using FMODUnity;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class CinematicaManager : MonoBehaviour
 {
     [Header("FMOD")]
-    public EventRef musicaEvento;
+    public EventReference musicaEvento;
+
+    [Header("Timeline")]
+    public PlayableDirector director;
 
     private FMOD.Studio.EventInstance _musicaInstance;
 
@@ -12,6 +16,16 @@ public class CinematicaManager : MonoBehaviour
     {
         _musicaInstance = RuntimeManager.CreateInstance(musicaEvento);
         _musicaInstance.start();
+    }
+
+    public void Pausar()
+    {
+        _musicaInstance.setPaused(true);
+    }
+
+    public void Reanudar()
+    {
+        _musicaInstance.setPaused(false);
     }
 
     private void OnDestroy()

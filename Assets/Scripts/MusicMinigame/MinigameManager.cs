@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using FMODUnity;
 using TMPro;
@@ -25,18 +26,18 @@ public class MinigameManager : MonoBehaviour
     //  FMOD
     // ------------------------------------------------------------------ //
     [Header("FMOD")]
-    public EventRef eventPath;
+    public EventReference eventPath;
 
     // ------------------------------------------------------------------ //
     //  Minijuegos
     // ------------------------------------------------------------------ //
     [Header("Minijuegos")]
-    public RhythmMinigame   rhythmMinigame;    // Alberto
-    public TuningMinigame   tuningMinigame;    // Aura
-    public BreathingMinigame breathingMinigame; // Ruby
+    public RhythmMinigame    rhythmMinigame;
+    public TuningMinigame    tuningMinigame;
+    public BreathingMinigame breathingMinigame;
 
     // ------------------------------------------------------------------ //
-    //  BPM por sección  (asigna desde código al llamar cada evento)
+    //  BPM
     // ------------------------------------------------------------------ //
     [Header("BPM de la canción")]
     public float bpmPorDefecto = 160f;
@@ -48,13 +49,6 @@ public class MinigameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     // ------------------------------------------------------------------ //
-    //  UI — Pausa
-    // ------------------------------------------------------------------ //
-    [Header("UI — Pausa")]
-    public GameObject      pausaCanvas;
-    public TextMeshProUGUI cuentaAtrasText;
-
-    // ------------------------------------------------------------------ //
     //  UI — Fin de partida
     // ------------------------------------------------------------------ //
     [Header("UI — Fin de partida")]
@@ -62,6 +56,7 @@ public class MinigameManager : MonoBehaviour
     public GameObject      resultadosCanvas;
     public TextMeshProUGUI conclusionText;
     public TextMeshProUGUI puntuacionFinalText;
+    public PauseMenu       pauseMenu;
 
     // ------------------------------------------------------------------ //
     //  Estado interno
@@ -71,7 +66,7 @@ public class MinigameManager : MonoBehaviour
     private bool _pausado;
     private bool _partidaTerminada;
 
-    private Coroutine    _gameOverTimer;
+    private Coroutine   _gameOverTimer;
     private CharacterData _personajeFallado;
 
     // ------------------------------------------------------------------ //
@@ -83,6 +78,12 @@ public class MinigameManager : MonoBehaviour
     private static readonly ConcurrentQueue<float>  _beatQueue   = new ConcurrentQueue<float>();
     private float _lastBeatTime;
     private float _currentBpm;
+
+    // ------------------------------------------------------------------ //
+    //  Sistema de burbujas
+    // ------------------------------------------------------------------ //
+    private readonly Dictionary<CharacterData, int> _pendingCounts = new Dictionary<CharacterData, int>();
+    private CharacterData _minijuegoPersonajeActivo;
 
     // ================================================================== //
     //  Unity lifecycle
@@ -96,13 +97,9 @@ public class MinigameManager : MonoBehaviour
 
     private void Start()
     {
-        // Ocultar todos los canvas de estado
-        pausaCanvas?.SetActive(false);
-        cuentaAtrasText?.gameObject.SetActive(false);
         gameOverCanvas?.SetActive(false);
         resultadosCanvas?.SetActive(false);
 
-        // Iniciar FMOD
         _fmodInstance = FMODUnity.RuntimeManager.CreateInstance(eventPath);
         _fmodCallback = new FMOD.Studio.EVENT_CALLBACK(TimelineCallback);
         _fmodInstance.setCallback(_fmodCallback,
@@ -116,7 +113,6 @@ public class MinigameManager : MonoBehaviour
     {
         if (_partidaTerminada) return;
 
-        // Sincronizar beats FMOD → Unity time
         while (_beatQueue.TryDequeue(out float tempo))
         {
             _lastBeatTime = Time.time;
@@ -124,25 +120,35 @@ public class MinigameManager : MonoBehaviour
             OnBeat?.Invoke(_currentBpm);
         }
 
-        // Procesar marcadores del hilo de audio en el hilo principal
         while (_markerQueue.TryDequeue(out string marker))
             ProcesarMarcador(marker);
-
-        // Pausa con Escape
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            AlternarPausa();
 
     }
 
 #if UNITY_EDITOR
     [ContextMenu("TEST — Ritmo (Alberto)")]
-    private void TestRitmo() => ActivarEventoPersonaje(alberto, rhythmMinigame, bpmPorDefecto);
+    private void TestRitmo()
+    {
+        alberto?.ActivarEvento();
+        alberto?.AbrirMinijuego();
+        AbrirMinijuegoPorTipo(alberto);
+    }
 
     [ContextMenu("TEST — Afinacion (Aura)")]
-    private void TestAfinacion() => ActivarEventoPersonaje(aura, tuningMinigame, bpmPorDefecto);
+    private void TestAfinacion()
+    {
+        aura?.ActivarEvento();
+        aura?.AbrirMinijuego();
+        AbrirMinijuegoPorTipo(aura);
+    }
 
     [ContextMenu("TEST — Respiracion (Ruby)")]
-    private void TestRespiracion() => ActivarEventoPersonaje(ruby, breathingMinigame, bpmPorDefecto);
+    private void TestRespiracion()
+    {
+        ruby?.ActivarEvento();
+        ruby?.AbrirMinijuego();
+        AbrirMinijuegoPorTipo(ruby);
+    }
 #endif
 
     private void OnDestroy()
@@ -160,16 +166,14 @@ public class MinigameManager : MonoBehaviour
 
     private void IniciarPartida()
     {
-        _puntuacion      = 0;
-        _juegoActivo     = true;
-        _pausado         = false;
-        _partidaTerminada = false;
+        _puntuacion               = 0;
+        _juegoActivo              = true;
+        _pausado                  = false;
+        _partidaTerminada         = false;
+        _minijuegoPersonajeActivo = null;
+        _pendingCounts.Clear();
 
         ActualizarScoreUI();
-
-        Debug.Log($"[MM] IniciarPartida — aura:{aura != null} alberto:{alberto != null} ruby:{ruby != null} ramon:{ramon != null}");
-        Debug.Log($"[MM] Minijuegos — rhythm:{rhythmMinigame != null} tuning:{tuningMinigame != null} breathing:{breathingMinigame != null}");
-        Debug.Log($"[MM] EventPath: '{eventPath}'  instancia válida: {_fmodInstance.isValid()}");
 
         aura?.IniciarJuego();
         alberto?.IniciarJuego();
@@ -177,11 +181,10 @@ public class MinigameManager : MonoBehaviour
         ramon?.IniciarJuego();
 
         _fmodInstance.start();
-        Debug.Log("[MM] FMOD event.start() llamado");
     }
 
     // ================================================================== //
-    //  Callback FMOD (hilo de audio — solo ConcurrentQueue, nunca Unity API)
+    //  Callback FMOD (hilo de audio)
     // ================================================================== //
 
     [AOT.MonoPInvokeCallback(typeof(FMOD.Studio.EVENT_CALLBACK))]
@@ -209,38 +212,36 @@ public class MinigameManager : MonoBehaviour
 
     private void ProcesarMarcador(string nombre)
     {
-        Debug.Log($"[MM] Marcador recibido: '{nombre}'");
-
         switch (nombre)
         {
-            // --- Eventos individuales ---
+            case "event_alberto_intro":
+                ActivarEventoPersonaje(alberto);
+                break;
+
             case "event_aura_verse1":
-                ActivarEventoPersonaje(aura, tuningMinigame, bpmPorDefecto);
+                ActivarEventoPersonaje(aura);
                 break;
 
             case "event_ruby_verse1":
-                ActivarEventoPersonaje(ruby, breathingMinigame, bpmPorDefecto);
+                ActivarEventoPersonaje(ruby);
                 break;
 
             case "event_alberto_chorus":
-                ActivarEventoPersonaje(alberto, rhythmMinigame, bpmPorDefecto);
+                ActivarEventoPersonaje(alberto);
                 break;
 
-            // --- Eventos simultáneos ---
             case "event_double_verse2":
-                ActivarEventoPersonaje(aura,  tuningMinigame,   bpmPorDefecto);
-                ActivarEventoPersonaje(ruby,  breathingMinigame, bpmPorDefecto);
+                ActivarEventoPersonaje(aura);
+                ActivarEventoPersonaje(ruby);
                 break;
 
             case "event_climax_bridge":
-                ActivarEventoPersonaje(aura,    tuningMinigame,   bpmPorDefecto);
-                ActivarEventoPersonaje(alberto, rhythmMinigame,   bpmPorDefecto);
-                ActivarEventoPersonaje(ruby,    breathingMinigame, bpmPorDefecto);
-                // Ramon: solo drain, sin ventana de minijuego (sin tipo asignado)
-                ramon?.ActivarEvento();
+                ActivarEventoPersonaje(aura);
+                ActivarEventoPersonaje(alberto);
+                ActivarEventoPersonaje(ruby);
+                ActivarEventoPersonaje(ramon);
                 break;
 
-            // --- Eventos especiales ---
             case "event_solo_resolve":
                 ManejarSoloResolve();
                 break;
@@ -252,25 +253,61 @@ public class MinigameManager : MonoBehaviour
     }
 
     // ------------------------------------------------------------------ //
-    //  Activación de evento + minijuego para un personaje
+    //  Activar evento: muestra burbuja y empieza drain
     // ------------------------------------------------------------------ //
 
-    private void ActivarEventoPersonaje<T>(CharacterData personaje, T minijuego, float bpm)
-        where T : MonoBehaviour
+    private void ActivarEventoPersonaje(CharacterData personaje)
     {
-        Debug.Log($"[MM] ActivarEventoPersonaje — personaje:{personaje?.characterName ?? "NULL"} minijuego:{minijuego?.GetType().Name ?? "NULL"}");
-
-        if (personaje == null) { Debug.LogWarning("[MM] personaje es NULL, abortando"); return; }
-        if (minijuego == null) { Debug.LogWarning("[MM] minijuego es NULL, abortando"); return; }
-
+        if (personaje == null) return;
         personaje.ActivarEvento();
-        Debug.Log($"[MM] ActivarEvento() llamado en {personaje.characterName}");
 
-        // Llamar Activate según el tipo concreto
-        if      (minijuego is RhythmMinigame    r) { Debug.Log("[MM] → RhythmMinigame.Activate()");    float actualBpm = _currentBpm > 0f ? _currentBpm : bpm; float beatStart = _lastBeatTime > 0f ? _lastBeatTime : Time.time; r.Activate(personaje, actualBpm, beatStart, OnMinijuegoCompletado); }
-        else if (minijuego is TuningMinigame    t) { Debug.Log("[MM] → TuningMinigame.Activate()");   t.Activate(personaje, bpm, OnMinijuegoCompletado); }
-        else if (minijuego is BreathingMinigame b) { Debug.Log("[MM] → BreathingMinigame.Activate()"); b.Activate(personaje, bpm, OnMinijuegoCompletado); }
-        else { Debug.LogWarning($"[MM] Tipo de minijuego no reconocido: {minijuego.GetType().Name}"); }
+        if (personaje.tipoMinijuego == TipoMinijuego.Ninguno) return;
+
+        AddPending(personaje);
+        personaje.MostrarBurbuja();
+
+        if (_minijuegoPersonajeActivo != null)
+            personaje.SetBurbujaInteractuable(false);
+    }
+
+    // ------------------------------------------------------------------ //
+    //  El jugador clica la burbuja → abre el minijuego
+    // ------------------------------------------------------------------ //
+
+    public void OnBubbleClicked(CharacterData personaje)
+    {
+        if (personaje == null || _minijuegoPersonajeActivo != null || _partidaTerminada) return;
+
+        _minijuegoPersonajeActivo = personaje;
+        personaje.OcultarBurbuja();
+        personaje.AbrirMinijuego();
+
+        CharacterData[] todos = { aura, alberto, ruby, ramon };
+        foreach (var c in todos)
+            if (c != null && c != personaje)
+                c.SetBurbujaInteractuable(false);
+
+        AbrirMinijuegoPorTipo(personaje);
+    }
+
+    private void AbrirMinijuegoPorTipo(CharacterData personaje)
+    {
+        if (personaje == null) return;
+        float actualBpm = _currentBpm > 0f ? _currentBpm : bpmPorDefecto;
+        float beatStart = _lastBeatTime > 0f ? _lastBeatTime : Time.time;
+
+        switch (personaje.tipoMinijuego)
+        {
+            case TipoMinijuego.Ritmo:
+                rhythmMinigame?.Activate(personaje, actualBpm, beatStart, OnMinijuegoCompletado);
+                break;
+            case TipoMinijuego.Afinacion:
+                tuningMinigame?.Activate(personaje, actualBpm, OnMinijuegoCompletado);
+                break;
+            case TipoMinijuego.Respiracion:
+                breathingMinigame?.Activate(personaje, actualBpm, OnMinijuegoCompletado);
+                break;
+        }
     }
 
     // ------------------------------------------------------------------ //
@@ -291,48 +328,48 @@ public class MinigameManager : MonoBehaviour
                 personaje.AñadirEstabilidad(25f);
                 AñadirPuntos(50);
                 break;
-            case MinigameResult.Failed:
-                // Sin recuperación, sin puntos
-                break;
         }
+
+        SubPending(personaje);
+        _minijuegoPersonajeActivo = null;
+
+        if (GetPending(personaje) > 0)
+            personaje.MostrarBurbuja();
+
+        CharacterData[] todos = { aura, alberto, ruby, ramon };
+        foreach (var c in todos)
+            if (c != null && GetPending(c) > 0)
+                c.SetBurbujaInteractuable(true);
     }
 
+    // ------------------------------------------------------------------ //
+    //  Helpers pendientes
+    // ------------------------------------------------------------------ //
+
+    private int  GetPending(CharacterData c) => _pendingCounts.TryGetValue(c, out int v) ? v : 0;
+    private void AddPending(CharacterData c) => _pendingCounts[c] = GetPending(c) + 1;
+    private void SubPending(CharacterData c) => _pendingCounts[c] = Mathf.Max(0, GetPending(c) - 1);
+
     // ================================================================== //
-    //  Pausa
+    //  Pausa — API para PauseMenu
     // ================================================================== //
 
-    public void AlternarPausa()
-    {
-        if (_pausado) StartCoroutine(ReanudarConCuentaAtras());
-        else          PausarJuego();
-    }
+    public bool IsPartidaTerminada => _partidaTerminada;
 
-    private void PausarJuego()
+    public void PausarDesdeMenu()
     {
+        if (_pausado || _partidaTerminada) return;
         _pausado = true;
         _fmodInstance.setPaused(true);
         SetPausadoTodos(true);
         rhythmMinigame?.SetPausado(true);
         tuningMinigame?.SetPausado(true);
         breathingMinigame?.SetPausado(true);
-        pausaCanvas?.SetActive(true);
     }
 
-    private IEnumerator ReanudarConCuentaAtras()
+    public void ReanudarDesdeMenu()
     {
-        pausaCanvas?.SetActive(false);
-
-        if (cuentaAtrasText != null)
-        {
-            cuentaAtrasText.gameObject.SetActive(true);
-            for (int i = 3; i >= 1; i--)
-            {
-                cuentaAtrasText.text = i.ToString();
-                yield return new WaitForSecondsRealtime(1f);
-            }
-            cuentaAtrasText.gameObject.SetActive(false);
-        }
-
+        if (!_pausado) return;
         _pausado = false;
         SetPausadoTodos(false);
         rhythmMinigame?.SetPausado(false);
@@ -367,11 +404,11 @@ public class MinigameManager : MonoBehaviour
 
     private void ActualizarScoreUI()
     {
-        if (scoreText != null) scoreText.text = $"Puntuación: {_puntuacion}";
+        if (scoreText != null) scoreText.text = $"{_puntuacion}";
     }
 
     // ================================================================== //
-    //  Game Over — personaje llega a 0
+    //  Game Over
     // ================================================================== //
 
     public void OnPersonajeFallado(CharacterData personaje)
@@ -404,6 +441,7 @@ public class MinigameManager : MonoBehaviour
         if (_partidaTerminada) return;
         TerminarPartida();
         gameOverCanvas?.SetActive(true);
+        pauseMenu?.MostrarMenuFinal();
     }
 
     // ================================================================== //
@@ -413,10 +451,6 @@ public class MinigameManager : MonoBehaviour
     private void ManejarSoloResolve()
     {
         if (alberto == null) return;
-        float estabilidadAlberto = alberto.Stability;
-        Debug.Log($"[Solo Resolve] Estabilidad de Alberto: {estabilidadAlberto:F1}");
-        // Aquí puedes usar estabilidadAlberto para modificar parámetros de FMOD
-        // o registrar el estado del solo para la narrativa final.
     }
 
     private void ManejarOutro()
@@ -427,13 +461,25 @@ public class MinigameManager : MonoBehaviour
     }
 
     // ================================================================== //
-    //  Fin de partida (común a Game Over y Outro)
+    //  Fin de partida
     // ================================================================== //
 
     private void TerminarPartida()
     {
         _partidaTerminada = true;
         _juegoActivo      = false;
+
+        if (_minijuegoPersonajeActivo != null)
+        {
+            _minijuegoPersonajeActivo.DesactivarEvento();
+            _minijuegoPersonajeActivo = null;
+        }
+
+        aura?.DesactivarEvento();
+        alberto?.DesactivarEvento();
+        ruby?.DesactivarEvento();
+        ramon?.DesactivarEvento();
+
         _fmodInstance.setPaused(true);
         SetPausadoTodos(true);
         rhythmMinigame?.SetPausado(true);
@@ -443,9 +489,10 @@ public class MinigameManager : MonoBehaviour
 
     private void MostrarResultados()
     {
-        if (conclusionText    != null) conclusionText.text     = ConstruirConclusion();
+        if (conclusionText      != null) conclusionText.text     = ConstruirConclusion();
         if (puntuacionFinalText != null) puntuacionFinalText.text = $"Puntuación final: {_puntuacion}";
         resultadosCanvas?.SetActive(true);
+        pauseMenu?.MostrarMenuFinal();
     }
 
     private string ConstruirConclusion()
@@ -453,10 +500,8 @@ public class MinigameManager : MonoBehaviour
         int enPositivo = 0;
         CharacterData[] todos = { aura, alberto, ruby, ramon };
         foreach (var c in todos)
-        {
             if (c != null && c.Estado == CharacterData.EstadoEstabilidad.Positivo)
                 enPositivo++;
-        }
 
         return enPositivo switch
         {
@@ -468,11 +513,4 @@ public class MinigameManager : MonoBehaviour
         };
     }
 
-    // ================================================================== //
-    //  Botón de reanudar (desde el Canvas de pausa, asignar en Inspector)
-    // ================================================================== //
-    public void BotonReanudar()
-    {
-        if (_pausado) StartCoroutine(ReanudarConCuentaAtras());
-    }
 }

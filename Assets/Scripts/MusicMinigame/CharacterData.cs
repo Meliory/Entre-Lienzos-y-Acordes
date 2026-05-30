@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+public enum TipoMinijuego { Ninguno, Ritmo, Afinacion, Respiracion }
+
 public class CharacterData : MonoBehaviour
 {
     // ------------------------------------------------------------------ //
@@ -10,59 +12,75 @@ public class CharacterData : MonoBehaviour
     [Header("Identificación")]
     public string characterName;
 
+    [Header("Tipo de Minijuego")]
+    public TipoMinijuego tipoMinijuego = TipoMinijuego.Ninguno;
+
     // ------------------------------------------------------------------ //
     //  FMOD
     // ------------------------------------------------------------------ //
-    [Header("FMOD")]
-    public string fmodParameter; // "stability_aura", "stability_alberto", etc.
+    [Header("FMOD — Estabilidad")]
+    public string fmodParameter;
+
+    [Header("FMOD — Distorsión")]
+    public string fmodDistortionParameter;
 
     // ------------------------------------------------------------------ //
-    //  Estabilidad  (todos los valores son ajustables en el Inspector)
+    //  Estabilidad
     // ------------------------------------------------------------------ //
     [Header("Estabilidad")]
     [Range(0, 100)] public float stability = 100f;
-    public float passiveDrain  = 0f;   // drain constante (Ruby usa 1.5)
-    public float eventDrain    = 12f;  // drain extra mientras el evento está activo
+    public float passiveDrain = 0f;
+    public float eventDrain   = 1.7f;
 
     // ------------------------------------------------------------------ //
     //  UI
     // ------------------------------------------------------------------ //
     [Header("UI")]
-    public Slider           stabilitySlider;   // slider de estabilidad
-    public Image            fillImage;         // Image del "Fill" del slider (cambia de color)
-    public TextMeshProUGUI  feelingText;        // texto que muestra el estado ("Tenso", etc.)
+    public Slider          stabilitySlider;
+    public Image           fillImage;
+    public TextMeshProUGUI feelingText;
+
+    // ------------------------------------------------------------------ //
+    //  Burbuja
+    // ------------------------------------------------------------------ //
+    [Header("Burbuja")]
+    public Button bubbleButton;
 
     // ------------------------------------------------------------------ //
     //  Colores por umbral
     // ------------------------------------------------------------------ //
-    static readonly Color ColPositivo      = new Color(0.18f, 0.76f, 0.34f);
-    static readonly Color ColTenso         = new Color(0.93f, 0.75f, 0.10f);
+    static readonly Color ColPositivo        = new Color(0.18f, 0.76f, 0.34f);
+    static readonly Color ColTenso           = new Color(0.93f, 0.75f, 0.10f);
     static readonly Color ColDesestabilizado = new Color(0.93f, 0.45f, 0.10f);
-    static readonly Color ColCritico       = new Color(0.85f, 0.18f, 0.18f);
-    static readonly Color ColFallado       = new Color(0.35f, 0.35f, 0.35f);
+    static readonly Color ColCritico         = new Color(0.85f, 0.18f, 0.18f);
+    static readonly Color ColFallado         = new Color(0.35f, 0.35f, 0.35f);
 
     // ------------------------------------------------------------------ //
-    //  Estado público (solo lectura desde fuera)
+    //  Estado público
     // ------------------------------------------------------------------ //
     public enum EstadoEstabilidad { Positivo, Tenso, Desestabilizado, Critico, Fallado }
-    public EstadoEstabilidad Estado { get; private set; }
-    public float Stability => stability;
-    public bool EventoActivo { get; private set; }
-    public bool HasReachedCritical { get; private set; }
+    public EstadoEstabilidad Estado          { get; private set; }
+    public float             Stability       => stability;
+    public bool              EventoActivo    { get; private set; }
+    public bool              MinijuegoAbierto { get; private set; }
+    public bool              HasReachedCritical { get; private set; }
 
     // ------------------------------------------------------------------ //
     //  Estado interno
     // ------------------------------------------------------------------ //
-    private bool _juegoActivo;
-    private bool _pausado;
-    private bool _failedNotificado;
+    private bool  _juegoActivo;
+    private bool  _pausado;
+    private bool  _failedNotificado;
+    private float _distortionActual;
 
     // ------------------------------------------------------------------ //
     //  Unity lifecycle
     // ------------------------------------------------------------------ //
     private void Start()
     {
-        Estado = (EstadoEstabilidad)(-1); // fuerza el refresco visual inicial
+        Estado = (EstadoEstabilidad)(-1);
+        OcultarBurbuja();
+        bubbleButton?.onClick.AddListener(() => MinigameManager.Instance.OnBubbleClicked(this));
         UpdateUI();
         PushToFMOD();
     }
@@ -73,13 +91,13 @@ public class CharacterData : MonoBehaviour
         AplicarDrain();
         UpdateUI();
         PushToFMOD();
+        ActualizarDistorsion();
     }
 
     // ------------------------------------------------------------------ //
     //  API pública
     // ------------------------------------------------------------------ //
 
-    /// <summary>Llamar desde MinigameManager al iniciar la partida.</summary>
     public void IniciarJuego()
     {
         _juegoActivo       = true;
@@ -89,22 +107,35 @@ public class CharacterData : MonoBehaviour
         PushToFMOD();
     }
 
-    public void SetPausado(bool pausado)
-    {
-        _pausado = pausado;
-    }
+    public void SetPausado(bool pausado) => _pausado = pausado;
 
-    public void ActivarEvento()
-    {
-        EventoActivo = true;
-    }
+    public void ActivarEvento() => EventoActivo = true;
 
     public void DesactivarEvento()
     {
-        EventoActivo = false;
+        EventoActivo     = false;
+        MinijuegoAbierto = false;
+        _distortionActual = 0f;
+        if (!string.IsNullOrEmpty(fmodDistortionParameter))
+            FMODUnity.RuntimeManager.StudioSystem.setParameterByName(fmodDistortionParameter, 0f);
     }
 
-    /// <summary>Sube estabilidad (tras completar un minijuego).</summary>
+    public void AbrirMinijuego() => MinijuegoAbierto = true;
+
+    public void MostrarBurbuja()
+    {
+        if (bubbleButton == null) return;
+        bubbleButton.gameObject.SetActive(true);
+        bubbleButton.interactable = true;
+    }
+
+    public void OcultarBurbuja() => bubbleButton?.gameObject.SetActive(false);
+
+    public void SetBurbujaInteractuable(bool valor)
+    {
+        if (bubbleButton) bubbleButton.interactable = valor;
+    }
+
     public void AñadirEstabilidad(float cantidad)
     {
         bool eraZero = stability <= 0f;
@@ -133,12 +164,21 @@ public class CharacterData : MonoBehaviour
         }
     }
 
+    private void ActualizarDistorsion()
+    {
+        if (string.IsNullOrEmpty(fmodDistortionParameter)) return;
+
+        float target = MinijuegoAbierto ? (1f - stability / 100f) : 0f;
+        float speed  = MinijuegoAbierto ? 1.5f : 2f;
+        _distortionActual = Mathf.MoveTowards(_distortionActual, target, speed * Time.deltaTime);
+        FMODUnity.RuntimeManager.StudioSystem.setParameterByName(fmodDistortionParameter, _distortionActual);
+    }
+
     private void UpdateUI()
     {
         if (stabilitySlider != null)
             stabilitySlider.value = stability;
 
-        // Determinar estado
         EstadoEstabilidad nuevoEstado;
         if      (stability <= 0f)  nuevoEstado = EstadoEstabilidad.Fallado;
         else if (stability < 25f)  nuevoEstado = EstadoEstabilidad.Critico;
@@ -146,7 +186,6 @@ public class CharacterData : MonoBehaviour
         else if (stability < 80f)  nuevoEstado = EstadoEstabilidad.Tenso;
         else                       nuevoEstado = EstadoEstabilidad.Positivo;
 
-        // Primera vez en crítico → penalización de puntos
         if (nuevoEstado == EstadoEstabilidad.Critico && !HasReachedCritical)
         {
             HasReachedCritical = true;
@@ -182,8 +221,8 @@ public class CharacterData : MonoBehaviour
             _                                 => ""
         };
 
-        if (fillImage  != null) fillImage.color  = color;
-        if (feelingText != null) feelingText.text = textoEstado;
+        if (fillImage   != null) fillImage.color  = color;
+        if (feelingText != null) feelingText.text  = textoEstado;
     }
 
     private void PushToFMOD()

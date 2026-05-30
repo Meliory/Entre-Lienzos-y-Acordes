@@ -9,7 +9,7 @@ namespace FMODUnity
     [AddComponentMenu("FMOD Studio/FMOD Studio Event Emitter")]
     public class StudioEventEmitter : EventHandler
     {
-        public EventRef EventReference;
+        public EventReference EventReference;
 
         [Obsolete("Use the EventReference field instead")]
         public string Event = "";
@@ -156,23 +156,23 @@ namespace FMODUnity
             if (!isQuitting)
             {
                 HandleGameEvent(EmitterGameEvent.ObjectDestroy);
+            }
 
-                if (instance.isValid())
+            if (instance.isValid())
+            {
+                RuntimeManager.DetachInstanceFromGameObject(instance);
+                if (eventDescription.isValid() && isOneshot)
                 {
-                    RuntimeManager.DetachInstanceFromGameObject(instance);
-                    if (eventDescription.isValid() && isOneshot)
-                    {
-                        instance.release();
-                        instance.clearHandle();
-                    }
+                    instance.release();
+                    instance.clearHandle();
                 }
+            }
 
-                DeregisterActiveEmitter(this);
+            DeregisterActiveEmitter(this);
 
-                if (Preload)
-                {
-                    eventDescription.unloadSampleData();
-                }
+            if (Preload)
+            {
+                eventDescription.unloadSampleData();
             }
         }
 

@@ -34,7 +34,7 @@ public class MusicManager : MonoBehaviour
     }
 
     //al entrar ZonaCancion
-    public void IniciarEvento(EventRef eventRef)
+    public void IniciarEvento(EventReference eventRef)
     {
         if (_eventInstance.isValid()) return;
         _eventInstance = RuntimeManager.CreateInstance(eventRef);
@@ -110,6 +110,12 @@ public class MusicManager : MonoBehaviour
             _paramValues[pista] = Mathf.MoveTowards(_paramValues[pista], target, step);
             _eventInstance.setParameterByName(pista.ParamName, _paramValues[pista]);
         }
+    }
+
+    public void SetPausado(bool pausado)
+    {
+        if (_eventInstance.isValid())
+            _eventInstance.setPaused(pausado);
     }
 
     //UI

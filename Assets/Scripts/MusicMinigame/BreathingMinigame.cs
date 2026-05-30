@@ -24,7 +24,8 @@ public class BreathingMinigame : MonoBehaviour
     public TextMeshProUGUI instruccionText;
 
     [Header("UI — Botón")]
-    public Button breathButton;
+    public Button          breathButton;
+    public TextMeshProUGUI breathButtonText;
 
     [Header("UI — Resultado")]
     public GameObject      resultPanel;
@@ -115,6 +116,8 @@ public class BreathingMinigame : MonoBehaviour
         StartCoroutine(RutinaRespiracion());
     }
 
+    public bool IsActivo => _activo;
+
     public void SetPausado(bool pausado)
     {
         _pausado = pausado;
@@ -136,6 +139,7 @@ public class BreathingMinigame : MonoBehaviour
             // ---------------------------------------------------------- //
             SetColorCirculo(ColCircleBase);
             SetInstruccion("Inhala", ColInstruccion);
+            SetTextoBoton("Mantén");
             if (breathCircle) breathCircle.localScale = Vector3.one * escalaMin;
 
             while (!_botonPulsado && _activo)
@@ -179,6 +183,7 @@ public class BreathingMinigame : MonoBehaviour
             // ---------------------------------------------------------- //
             SetColorCirculo(ColCirclePeak);
             SetInstruccion("Exhala", ColInstruccionEx);
+            SetTextoBoton("Suelta");
             yield return new WaitForSeconds(0.15f);
 
             // ---------------------------------------------------------- //
@@ -273,6 +278,7 @@ public class BreathingMinigame : MonoBehaviour
         if (breathCircleImage) breathCircleImage.color = ColCircleBase;
         if (instruccionText)   instruccionText.gameObject.SetActive(false);
         if (resultPanel)       resultPanel.SetActive(false);
+        SetTextoBoton("Mantén");
         if (cycleDots != null)
             foreach (var d in cycleDots) if (d) d.color = ColDotPendiente;
     }
@@ -283,6 +289,11 @@ public class BreathingMinigame : MonoBehaviour
         instruccionText.text  = texto;
         instruccionText.color = color;
         instruccionText.gameObject.SetActive(texto.Length > 0);
+    }
+
+    private void SetTextoBoton(string texto)
+    {
+        if (breathButtonText) breathButtonText.text = texto;
     }
 
     private void SetColorCirculo(Color color)

@@ -106,7 +106,7 @@ namespace FMODUnity
             Guid = guid;
         }
 
-        public EventNotFoundException(EventRef eventReference)
+        public EventNotFoundException(EventReference eventReference)
             : base("[FMOD] Event not found: " + eventReference.ToString())
         {
             Guid = eventReference.Guid;

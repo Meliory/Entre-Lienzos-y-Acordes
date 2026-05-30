@@ -23,6 +23,10 @@ public class CinematicaDialogo : MonoBehaviour
     [Header("UI — Paneles por personaje")]
     public PanelPersonaje[] paneles;
 
+    [Header("UI - Panel Final")]
+    public GameObject panelFinal;
+    public GameObject botonVolver;
+
     [Header("Diálogos (en orden)")]
     public LineaDialogo[] lineas;
 
@@ -68,5 +72,11 @@ public class CinematicaDialogo : MonoBehaviour
     public void EsconderVela()
     {
         candle.SetActive(false);
+    }
+
+    public void MostrarPanelFinal()
+    {
+        panelFinal.SetActive(true);
+        botonVolver.SetActive(false);
     }
 }

@@ -66,6 +66,9 @@ namespace FMODUnity
         private static byte[] eventSet3DAttributes;
         private static byte[] systemGetBus;
 
+        // Arbitrary value to ensure no collisions with any user windows
+        const int WINDOWID = 0x00FDFD01;
+
 #if UNITY_URP_EXIST
         private GameObject vrDebugOverlay;
         private RectTransform vrDebugRectTransform;
@@ -663,7 +666,7 @@ retry:
                 debugStyle.fontSize = currentPlatform.OverlayFontSize;
                 if (studioSystem.isValid() && isOverlayEnabled)
                 {
-                    windowRect = GUI.Window(GetInstanceID(), windowRect, DrawDebugOverlay, "FMOD Studio Debug", debugStyle);
+                    windowRect = GUI.Window(WINDOWID, windowRect, DrawDebugOverlay, "FMOD Studio Debug", debugStyle);
                 }
             }
             else
@@ -1176,7 +1179,7 @@ retry:
             return guid;
         }
 
-        public static EventRef PathToEventReference(string path)
+        public static EventReference PathToEventReference(string path)
         {
             FMOD.GUID guid;
 
@@ -1190,13 +1193,13 @@ retry:
             }
 
 #if UNITY_EDITOR
-            return new EventRef() { Path = path, Guid = guid };
+            return new EventReference() { Path = path, Guid = guid };
 #else
             return new EventReference() { Guid = guid };
 #endif
         }
 
-        public static FMOD.Studio.EventInstance CreateInstance(EventRef eventReference)
+        public static FMOD.Studio.EventInstance CreateInstance(EventReference eventReference)
         {
             try
             {
@@ -1241,7 +1244,7 @@ retry:
             return newInstance;
         }
 
-        public static void PlayOneShot(EventRef eventReference, Vector3 position = new Vector3())
+        public static void PlayOneShot(EventReference eventReference, Vector3 position = new Vector3())
         {
             try
             {
@@ -1275,7 +1278,7 @@ retry:
             }
         }
 
-        public static void PlayOneShotAttached(EventRef eventReference, GameObject gameObject)
+        public static void PlayOneShotAttached(EventReference eventReference, GameObject gameObject)
         {
             try
             {
@@ -1336,7 +1339,7 @@ retry:
             return true;
         }
 
-        public static FMOD.Studio.EventDescription GetEventDescription(EventRef eventReference)
+        public static FMOD.Studio.EventDescription GetEventDescription(EventReference eventReference)
         {
             try
             {

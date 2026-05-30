@@ -179,7 +179,7 @@ namespace FMODUnity
                 position += replaceLength;
                 position = path.IndexOf(findText, position, StringComparison.CurrentCultureIgnoreCase);
             }
-            EventRef newEventReference = EventRef.Find(path);
+            EventReference newEventReference = EventReference.Find(path);
             eventReferenceProperty.SetEventReference(newEventReference.Guid, newEventReference.Path);
             return serializedObject.ApplyModifiedProperties();
         }

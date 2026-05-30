@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FMODUnity
 {
     [Serializable]
-    public struct EventRef
+    public struct EventReference
     {
         public FMOD.GUID Guid;
 
@@ -29,14 +29,14 @@ namespace FMODUnity
             }
         }
 
-        public static EventRef Find(string path)
+        public static EventReference Find(string path)
         {
             if (GuidLookupDelegate == null)
             {
                 throw new InvalidOperationException("EventReference.Find called before EventManager was initialized");
             }
 
-            return new EventRef { Path = path, Guid = GuidLookupDelegate(path) };
+            return new EventReference { Path = path, Guid = GuidLookupDelegate(path) };
         }
 #else
         public override string ToString()

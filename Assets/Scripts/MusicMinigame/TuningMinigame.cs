@@ -102,6 +102,8 @@ public class TuningMinigame : MonoBehaviour
         StartCoroutine(CalibrateZona());
     }
 
+    public bool IsActivo => _activo;
+
     public void SetPausado(bool pausado) => _pausado = pausado;
 
     private IEnumerator CalibrateZona()

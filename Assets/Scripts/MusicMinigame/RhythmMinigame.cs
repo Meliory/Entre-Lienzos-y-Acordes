@@ -124,6 +124,8 @@ public class RhythmMinigame : MonoBehaviour
         StartCoroutine(RutinaObservacion());
     }
 
+    public bool IsActivo => _activo;
+
     public void SetPausado(bool pausado) => _pausado = pausado;
 
     private void OnBeatRecibido(float bpm)
