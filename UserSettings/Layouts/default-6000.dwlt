@@ -120,7 +120,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 36
+  controlID: 35
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 37
+  controlID: 36
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -669,20 +669,17 @@ MonoBehaviour:
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -10604
-      - m_Data: -2492
+      - m_Data: -4302
+      - m_Data: -3916
+      - m_Data: -3008
+      - m_Data: -2984
+      - m_Data: -2700
+      - m_Data: -2660
       - m_Data: -1332
-      - m_Data: 51808
-      - m_Data: 52100
-      - m_Data: 52168
-      - m_Data: 56486
-      - m_Data: 56586
-      - m_Data: 56906
-      - m_Data: 57166
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Text (TMP)
-        m_OriginalName: Text (TMP)
+        m_Name: 
+        m_OriginalName: 
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
@@ -690,10 +687,10 @@ MonoBehaviour:
           width: 0
           height: 0
         m_UserData:
-          m_Data: 57174
+          m_Data: 0
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 0
+        m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 6}
@@ -1371,7 +1368,7 @@ MonoBehaviour:
     m_FarClip: 10000
     m_DynamicClip: 1
     m_OcclusionCulling: 0
-  m_LastSceneViewRotation: {x: 0.040204428, y: 0.28809428, z: -0.012105518, w: 0.95668477}
+  m_LastSceneViewRotation: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
   m_LastSceneViewOrtho: 0
   m_Viewpoint:
     m_SceneView: {fileID: 14}
@@ -1460,7 +1457,6 @@ MonoBehaviour:
       m_Data: 51508
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 51374
     - m_Data: 51376
     - m_Data: 51378
     - m_Data: 51380
@@ -1473,7 +1469,7 @@ MonoBehaviour:
     - m_Data: 51394
     - m_Data: 51396
     - m_Data: 51398
-    - m_Data: 2147483647
+    - m_Data: 51400
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1506,7 +1502,6 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 51374
     - m_Data: 51376
     - m_Data: 51378
     - m_Data: 51380
@@ -1519,6 +1514,7 @@ MonoBehaviour:
     - m_Data: 51394
     - m_Data: 51396
     - m_Data: 51398
+    - m_Data: 51400
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
